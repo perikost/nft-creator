@@ -231,7 +231,7 @@ module overmind::NonFungibleToken {
         @return the NFT's `name`
     */
     public fun name(nft: &NonFungibleToken): String {
-
+        nft.name
     }
 
     /* 
@@ -240,7 +240,7 @@ module overmind::NonFungibleToken {
         @return the NFT's `description`
     */
     public fun description(nft: &NonFungibleToken): String {
-
+        nft.description
     }
 
     /* 
@@ -249,7 +249,7 @@ module overmind::NonFungibleToken {
         @return the NFT's `image`
     */
     public fun url(nft: &NonFungibleToken): Url {
-        
+        nft.image
     }
 
     //==============================================================================================
