@@ -231,6 +231,53 @@ module overmind::NonFungibleToken {
         ctx: &mut TxContext,
     ): NonFungibleToken {
         
+
+        let NonFungibleToken {
+            id: id1,
+            name: name1,
+            description: _,
+            image: _,
+        } = nft1;
+
+        let NonFungibleToken {
+            id: id2,
+            name: name2,
+            description: _,
+            image: _,
+        } = nft2;
+
+        // create the name of the combined NFT
+        let new_name = *&name1;
+        string::append(&mut new_name, string::utf8(b" + "));
+        string::append(&mut new_name, name2);
+
+        // create the description of the combined NFT
+        let new_description = string::utf8(b"Combined NFT of ");
+        string::append(&mut new_description, name1);
+        string::append(&mut new_description, string::utf8(b" and "));
+        string::append(&mut new_description, name2);
+
+        // create the new NFT object with the combined properties
+        let combined_nft = NonFungibleToken {
+            id: object::new(ctx),
+            name: new_name,
+            description: new_description,
+            image: url::new_unsafe_from_bytes(new_image_url)
+        };
+
+        // notify observers of the newly combined NFT
+        event::emit(NonFungibleTokenCombined {
+            nft1_id: object::uid_to_inner(&id1),
+            nft2_id: object::uid_to_inner(&id2),
+            new_nft_id: object::id(&combined_nft),
+        });
+
+        // delete the old NFTs
+        object::delete(id1);
+        object::delete(id2);
+
+        // return combined NFT object
+        combined_nft
     }
 
     /* 
