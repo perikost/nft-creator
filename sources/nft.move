@@ -186,7 +186,33 @@ module overmind::NonFungibleToken {
         minter_cap: &mut MinterCap,
         ctx: &mut TxContext, 
     ) {
-        
+        // get coin's balance
+        let coin_bal = coin::value<SUI>(payment_coin);
+
+        // coin's balance must be greater than the withdraw amount
+        assert!(coin_bal >= 1000000000, EInsufficientPayment);
+
+        // create NFT object
+        let nft = NonFungibleToken {
+            id: object::new(ctx),
+            name: string::utf8(nft_name),
+            description: string::utf8(nft_description),
+            image: url::new_unsafe_from_bytes(nft_image)
+        };
+
+        // notify observers about the newly minted NFT
+        event::emit(NonFungibleTokenMinted {
+            nft_id: object::id(&nft),
+            recipient: recipient,
+        });
+
+        // transfer the NFT to the recipient
+        transfer::transfer(nft, recipient);
+
+        // take 1 SUI from the coin's balance and add it to the sales balance of the MinterCap object
+        // the original coin represents the change
+        let one_sui_coin = coin::take<SUI>(coin::balance_mut<SUI>(payment_coin), 1000000000, ctx);
+        coin::put<SUI>(&mut minter_cap.sales, one_sui_coin);
     }
 
     /* 
