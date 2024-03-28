@@ -305,7 +305,20 @@ module overmind::NonFungibleToken {
         @param nft - the NFT object
     */
     public fun burn_nft(nft: NonFungibleToken) {
-        
+        let NonFungibleToken {
+            id,
+            name: _,
+            description: _,
+            image: _,
+        } = nft;
+
+        // notify observers of the deleted NFT
+        event::emit(NonFungibleTokenDeleted {
+            nft_id: object::uid_to_inner(&id),
+        });
+
+        // delete NFT
+        object::delete(id);
     }
 
     /* 
