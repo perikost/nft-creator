@@ -291,7 +291,13 @@ module overmind::NonFungibleToken {
         minter_cap: &mut MinterCap,
         ctx: &mut TxContext,
     ): Coin<SUI> {
-        
+        // notify observers of the withdrawal action
+        event::emit(SalesWithdrawn {
+            amount: balance::value(&minter_cap.sales)
+        });
+
+        // withdraw sales and return the withdrawn coin
+        coin::from_balance(balance::withdraw_all(&mut minter_cap.sales), ctx)
     }
 
     /*
